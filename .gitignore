@@ -573,3 +573,5 @@ dmypy.json
 cython_debug/
 
 .idea/vcs.xml
+*.pyc
+*.pyc
