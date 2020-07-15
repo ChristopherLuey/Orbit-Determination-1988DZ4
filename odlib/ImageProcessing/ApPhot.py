@@ -53,7 +53,7 @@ def main():
 	print(s)
 
 
-	print("Test File Input: ", _f)
+	print("Test File input: ", _f)
 	print("Object Near: ({}, {})".format(x, y))
 	print("Aperture Radius:", radius)
 	print("Annulus Inner Radius:", inner_annulus)

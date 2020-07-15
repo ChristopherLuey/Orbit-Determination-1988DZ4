@@ -7,8 +7,8 @@ from datetime import datetime
 def main():
     # Parse file & gather inputs
     # Analyzing and predicting for asteroid 2002QF15
-    _file_name = "Input/OrbitalElements/2002QF15.txt"
-    _file_name_prediction = "Input/Ephemeris/2002QF15.txt"
+    _file_name = "input/OrbitalElements/2002QF15.txt"
+    _file_name_prediction = "input/Ephemeris/2002QF15.txt"
 
     f = open(_file_name, "r").readlines()
     solve_date, name, pos, vel, earth_sun = datetime.strptime(f[0].strip(), "%Y/%m/%d %H:%M:%S"), f[1].strip(), np.array(list(map(str.strip, f[2].split("\t")))).astype(np.float), np.array(list(map(str.strip, f[3].split("\t")))).astype(np.float), np.array(list(map(str.strip, f[5].split("\t")))).astype(np.float)
