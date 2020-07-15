@@ -574,9 +574,7 @@ cython_debug/
 
 .idea/vcs.xml
 *.pyc
-*.pyc
 odlib/__pycache__/Ephemeris.cpython-37.pyc
 odlib/__pycache__/Asteroid.cpython-37.pyc
 odlib/ImageProcessing/__pycache__/LSPR.cpython-37.pyc
-odlib/__pycache__/Ephemeris.cpython-37.pyc
-odlib/__pycache__/Asteroid.cpython-37.pyc
+/.idea/
