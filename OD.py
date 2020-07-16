@@ -26,8 +26,6 @@ def main():
         prediction_datetime, earth_sun_ = prediction[0], prediction[1]
         asteroid.set_earth_sun_vector(prediction_datetime, earth_sun_)
         prediction_date = od.calculate_julian_date(datetime=prediction_datetime)
-        print("\nERROR\n\tDetected incorrect M...\n\tOverriding with expected M")
-        asteroid.set_mean_anomaly(prediction[0], M=158.5663308495127)
         ra, dec = asteroid.calculate_RA_dec(prediction_datetime)
         _ra, _dec = od.Ephemeris.calculate_RA_dec_ephem(prediction_datetime, asteroid)
         print("\nRA/Dec Prediction:\n\tJulian Date:", prediction_date, "\n\tDate (mm:dd:yyyy HH:MM:SS):", prediction_datetime.strftime("%m/%d/%Y %H:%M:%S"), "\n\tEarth Sun Vector:", earth_sun_, "\n\tCalculated:", ra, dec, "\n\tPyephem Expected:", _ra, _dec)
@@ -50,7 +48,5 @@ def main():
 
 if __name__ == '__main__':
 
-    # RA/Dec calculation doesn't work. I know that my calculation for mean anomaly on Aug 3 is incorrect, not sure if
-    # it's a units problem. When applying the correct mean anomaly, the RA and dec I calculate is incorrect. I
-    # believe that there is an issue with radians and degrees since my E value is correct
+    # For f&g run odlib/GaussMethod.py
     main()

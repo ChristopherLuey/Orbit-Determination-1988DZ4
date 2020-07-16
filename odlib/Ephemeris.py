@@ -8,15 +8,12 @@ from odlib.odmath import NewtonRaphson
 
 def calculate_M(a, M, t, t2):
     # Semimajor axis, mean anomaly t0 (aug 3), t2 (july 13)
-    print("\nCalculated M for Aug 3:", (t - t2)*((k**2/a**3)**(1/2)) + M)
-    print("Expected M for Aug 3:", "158.5663308495127")
-    # Something is going wrong here
-    return (t - t2)*((k**2/a**3)**(1/2)) + M
+    return degrees((t - t2)*((k**2/a**3)**(1/2)) + radians(M))
 
 
 def calculate_E(M, e):
     # M at ephemeris time, eccentricity
-    return NewtonRaphson.newton_raphson(M, e, 1e-10)
+    return NewtonRaphson.newton_raphson_mean_anomaly(radians(M), e, 1e-10)
 
 
 def calculate_cartesian_coordinates(a, E, e):
@@ -36,7 +33,7 @@ def convert_cartesian_ecliptic(r, OM, i, omega):
 
 def convert_ecliptic_cartesian(r):
     # position ecliptic
-    rot_a = np.array([[1, 0, 0], [0, (cos(radians(EPSILON))), -(sin(radians(EPSILON)))], [0, (sin(radians(EPSILON))), (cos(radians(EPSILON)))]])
+    rot_a = np.array([[1, 0, 0], [0, (cos(EPSILON)), -(sin(EPSILON))], [0, (sin(EPSILON)), (cos(EPSILON))]])
     return np.dot(rot_a, r)
 
 

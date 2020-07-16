@@ -21,6 +21,7 @@ class Asteroid:
         self.ascending_node = OrbitalElements.calculate_longitude_of_ascending_node(self.angular_momentum, self.inclination)
         self.argument_perihelion = OrbitalElements.calculate_perihelion(self.position, self.inclination, self.semimajor_axis, self.eccentricity, self.velocity, self.angular_momentum,self.ascending_node)
         self.eccentric_anomaly = OrbitalElements.calculate_eccentric_anomaly(self.eccentricity, self.position, self.semimajor_axis)
+        #
         self.mean_anomaly = {self.date: OrbitalElements.calculate_mean_anomaly(self.eccentricity, self.eccentric_anomaly)}
 
         self.perihelion_passage = OrbitalElements.calculate_last_perihelion_passage(self.mean_anomaly[self.date], self.semimajor_axis, self.julian_date)

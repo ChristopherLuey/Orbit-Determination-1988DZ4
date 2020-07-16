@@ -50,3 +50,16 @@ def calculate_eccentric_anomaly(e, r, a):
 def calculate_last_perihelion_passage(M, a, t):
     # mean anomaly, semimajor axis, julian date, datetime
     return -(M / ((k**2/a**3) ** (1/2))) + t
+
+
+def calculate_n(mu=None, a=None, h=None, e=None, r=None, r_dot=None):
+    if mu is not None and a is not None:
+        return (mu/a**3) ** (1/2)
+    elif h is not None and e is not None and a is not None:
+        return h/((a**2) * (1-e**2) ** (1/2))
+    elif r is not None and r_dot is not None:
+        a,h = calculate_semimajor_axis(r, r_dot), np.linalg.norm(calculate_angular_momentum(r, r_dot))
+        return h / ((a ** 2) * (1 - calculate_eccentricity(h, a) ** 2) ** (1 / 2))
+    else:
+        return 0
+

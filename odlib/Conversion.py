@@ -1,5 +1,6 @@
 from odlib.Constants import k
-from math import acos, asin, pi
+from math import acos, asin, pi, cos, sin, radians, degrees
+import numpy as np
 
 
 def convert_day_to_gaussian(days):
@@ -59,4 +60,8 @@ def calculate_decimal_days(hours=None, minutes=None, seconds=None, days=None, da
         return datetime.second * 1.1574074e-5 + datetime.minute * 0.00069444444 + datetime.hour * 0.041666667 + datetime.day
     else:
         return seconds * 1.1574074e-5 + minutes * 0.00069444444 + hours * 0.041666667 + days
+
+
+def convert_RA_dec_rho(ra, dec):
+    return np.array([cos(radians(ra) * sin(radians(dec))), sin(radians(ra)) * cos(radians(dec)), sin(radians(dec))])
 

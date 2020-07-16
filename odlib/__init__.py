@@ -6,3 +6,4 @@ from . import Conversion
 from .Conversion import *
 from . import Constants
 from .ImageProcessing import *
+from . import GaussMethod
