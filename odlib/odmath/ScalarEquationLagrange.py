@@ -14,10 +14,10 @@ def ScalarEquationLagrange(tau, earth_sun2, rhohat2, ds):
     roots = np.roots(np.array([1, 0, a, 0, 0, b, 0, 0, c]))
     roots = roots[np.isreal(roots)][roots[np.isreal(roots)] > 0]
     for i in roots: rho2 = np.append(rho2, A + B/(i**3))
-    return roots, rho2
+    return roots[rho2 > 0], rho2[rho2 > 0], roots
 
 
-def test():
+def _test():
     tau2 = [-0.15481889055, 0.15481889055, 0.3096377811]
     earth_sun2 = [-0.2398478458274071, 0.9065739917845802, 0.392962374977095]
     rhohat2 = [-0.8518563498182248, -0.2484702599212149, 0.4610892421311239]
@@ -26,4 +26,4 @@ def test():
 
 
 if __name__ == '__main__':
-    test()
+    _test()

@@ -24,12 +24,12 @@ def main():
 	radius = 5.0
 	inner_annulus, outer_annulus = 8.0, 13.0
 
-	# _f = input("Enter a file path: ")
+	# _f = io("Enter a file path: ")
 	# try:
-	# 	x, y = list(map(float, input("X, Y: ")Newton-Raphson.split(",")))
-	# 	radius = float(input("Enter a radius for the circular aperture: "))
-	# 	inner_annulus, outer_annulus = list(map(float, input("Enter the inner and outer annulus radius: ").split(",")))
-	# except: print("Invalid input")
+	# 	x, y = list(map(float, io("X, Y: ")Newton-Raphson.split(",")))
+	# 	radius = float(io("Enter a radius for the circular aperture: "))
+	# 	inner_annulus, outer_annulus = list(map(float, io("Enter the inner and outer annulus radius: ").split(",")))
+	# except: print("Invalid io")
 	try:
 		_image = getdata(filename=_f)
 	except:
@@ -53,7 +53,7 @@ def main():
 	print(s)
 
 
-	print("Test File input: ", _f)
+	print("Test File io: ", _f)
 	print("Object Near: ({}, {})".format(x, y))
 	print("Aperture Radius:", radius)
 	print("Annulus Inner Radius:", inner_annulus)

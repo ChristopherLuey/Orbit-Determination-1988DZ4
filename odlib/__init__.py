@@ -2,8 +2,11 @@ from . import Ephemeris
 from . import OrbitalElements
 from . import Asteroid
 from .odmath import *
+from .odmath import ScalarEquationLagrange
+from .odmath import NewtonRaphson
 from . import Conversion
 from .Conversion import *
 from . import Constants
+from .Constants import *
 from .ImageProcessing import *
 from . import GaussMethod

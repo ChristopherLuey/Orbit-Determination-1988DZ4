@@ -1,5 +1,5 @@
 import numpy as np
-from math import degrees, radians, acos, cos, sin
+from math import degrees, radians, acos, cos, sin, sqrt
 from odlib.Constants import *
 from odlib.Conversion import atan2
 
@@ -48,8 +48,9 @@ def calculate_eccentric_anomaly(e, r, a):
 
 
 def calculate_last_perihelion_passage(M, a, t):
-    # mean anomaly, semimajor axis, julian date, datetime
-    return -(M / ((k**2/a**3) ** (1/2))) + t
+    # mean anomaly, semimajor axis, julian date
+    #return -(M*a**(3/2))/k + t
+    return -(radians(M) * sqrt(a ** 3)) / k + t
 
 
 def calculate_n(mu=None, a=None, h=None, e=None, r=None, r_dot=None):

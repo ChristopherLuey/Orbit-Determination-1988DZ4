@@ -17,7 +17,7 @@ def LSPR(f):
     c_a, c_d = np.array([[np.sum(a)], [np.dot(a, x)], [np.dot(a, y)]]), np.array([[np.sum(d)], [np.dot(d, x)], [np.dot(d, y)]])
     plate_a, plate_d = np.dot(matrix, c_a), np.dot(matrix, c_d)
 
-    # Gather x,y input of object
+    # Gather x,y io of object
     x_obj = float(input("x of centroid of unknown object: "))
     y_obj = float(input("y of centroid of unknown object: "))
 
@@ -58,7 +58,7 @@ def _parse(file):
 
 def test(f, x_obj, y_obj, uncert_a, uncert_d, a_obj, d_obj, plate_a, plate_d):
     # Print outputs
-    print("\n\n\n\ntest input file:", f)
+    print("\n\n\n\ntest io file:", f)
     print("test position (x,y):", x_obj, y_obj)
     print("\n\n***************\nPlate Constants\n***************")
     txt = "b1: {b1} deg\nb2: {b2} deg\na11: {a11} deg/pix\na12: {a12} deg/pix\na21: {a21} deg/pix\na22: {a22} deg/pix".format(b1=plate_a[0][0], b2=plate_d[0][0], a11=plate_a[1][0], a12=plate_a[2][0], a21=plate_d[1][0], a22=plate_d[2][0])

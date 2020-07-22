@@ -1,3 +1,3 @@
-from .ApPhot import *
-from .centroid import *
+from .AperturePhotometry import *
+from .Centroid import *
 from .LSPR import *

@@ -1,41 +1,52 @@
 import numpy as np
-from odlib.odmath import ScalarEquationLagrange, NewtonRaphson
 import odlib as od
+from odlib.odmath import NewtonRaphson
 from math import cos, sin, inf
 
 
-def calculate_fg(tau, r2, r2_dot, series=False):
-	if series:
-		u = 1/(np.linalg.norm(r2) ** 2)
+def calculate_fg(tau, r2, r2_dot=None, series=False):
+	if r2_dot is None:
+		u = 1. / (np.linalg.norm(r2) ** 3)
+		f = 1. - 0.5*u*tau**2
+		g = tau - (1/6)*u*tau**3
+	elif series is True:
+		u = 1/(np.linalg.norm(r2) ** 3)
 		z = np.dot(r2, r2_dot)/ (np.linalg.norm(r2) ** 2)
 		q = (np.dot(r2_dot, r2_dot)/ (np.linalg.norm(r2) ** 2)) - u
 		f = 1 - 0.5*u*tau**2 + 0.5*u*z*tau**3 + (1/24)*(3*u*q - 15*u*z**2 + u**2)*tau**4
 		g = tau - (1/6)*u*tau**3 + (1/4)*u*z*tau**4
-	else:
-		a, n = od.OrbitalElements.calculate_semimajor_axis(r2, r2_dot), od.OrbitalElements.calculate_n(r=r2, r_dot=r2_dot)
-		delta_E = od.odmath.NewtonRaphson.newton_raphson_delta_eccentric_anomaly(tau, r2, r2_dot, tol=1.e-12)
-		f, g = 1-(a/np.linalg.norm(r2))*(1-cos(delta_E)), tau + (1/n)*(sin(delta_E) - delta_E)
+	elif series is False:
+		delta_E = od.odmath.NewtonRaphson.newton_raphson_delta_eccentric_anomaly(tau, r2, r2_dot, tol=1.e-14)
+		f, g = 1-(od.OrbitalElements.calculate_semimajor_axis(r2, r2_dot)/np.linalg.norm(r2))*(1-cos(delta_E)), tau + (1/od.OrbitalElements.calculate_n(r=r2, r_dot=r2_dot))*(sin(delta_E) - delta_E)
 	return f, g
 
 
 def calculate_c1c3(fg):
-	#fg = [f1, g1, f3, g3]
-	c1 = fg[1][1] / (fg[0][0] *fg[1][1] - fg[0][1] * fg[1][0])
+	#fg = [[f1, g1], [f3, g3]]
+	c1 = fg[1][1] / (fg[0][0] * fg[1][1] - fg[0][1] * fg[1][0])
 	c3 = -fg[0][1] / (fg[0][0] *fg[1][1] - fg[0][1] * fg[1][0])
 	return np.array([c1, c3])
 
 
-def calculate_scaler_ranges(R, rhohat, c):
-	D0 = np.dot(rhohat[0], rhohat[1] * rhohat[2])
+def calculate_scaler_ranges(c, D0, D):
+	# D = [[D11, D12, D13],
+	#      [D21, D22, D23],
+	#      [D31, D32, D33]]
+	# c = [c1, c3]
+	rho = np.empty((0,3))
+	for i in range(3): rho = np.append(rho, (c[0]*D[i][0] - D[i][1] + c[1]*D[i][2]) / ([c[0], -1, c[1]][i]*D0))
+	return rho
+
+
+def calculate_D(rhohat, R):
+	D0 = np.dot(rhohat[0], np.cross(rhohat[1], rhohat[2]))
 	D1, D2, D3 = np.array([]), np.array([]), np.array([])
 	for i in range(3):
 		D1 = np.append(D1, np.dot(rhohat[2], np.cross(R[i], rhohat[1])))
 		D2 = np.append(D2, np.dot(rhohat[2], np.cross(rhohat[0], R[i])))
 		D3 = np.append(D3, np.dot(rhohat[0], np.cross(rhohat[1], R[i])))
-	rho = np.array([])
 	D = np.array([D1, D2, D3])
-	for i in range(3): rho = np.append(rho, (c[0]*D[i][0] - D[i][1] + c[1]*D[i][2]) / (c[0]*D0))
-	return rho
+	return D0, D
 
 
 def calculate_position_vector(rho, rhohat, R):
@@ -54,40 +65,30 @@ def calculate_r1r3(fg, r2, r2_dot):
 	return fg[0][0] * r2 + fg[0][1] * r2_dot, fg[1][0] * r2 + fg[1][1] * r2_dot
 
 
-def calculate_velocity_vector(d1d3, r1r3):
-	return d1d3[0]*r1r3[0] + d1d3[1]*r1r3[1]
+def calculate_velocity_vector(d1d3, r):
+	return d1d3[0]*r[0] + d1d3[1]*r[2]
 
 
-def test():
-	tau1 = -0.32618569435308475
-	tau3 = 0.050840808143482484
-	r2 = np.array([0.26640998194891174, -1.382856212643199, - 0.505199925482389])
-	r2_dot = np.array([0.8439832722802604, -0.39937767878456487, 0.14200790188593015])
-	rhohat = od.convert_RA_dec_rho(od.convert_HMS_degrees(*list(map(float, "17:27:15.08".split(":")))), od.convert_DMS_degrees(*list(map(float,"-24:44:53.0".split(":")))))
-	R = np.array([-3.092452663004570E-02, 9.321463833793008E-01, 4.040478235741391E-01])
-	fg_arr = np.array([calculate_fg(tau1, r2, r2_dot), calculate_fg(tau3, r2, r2_dot)])
-	print(fg_arr)
-	# c1c3_arr = calculate_c1c3(fg_arr)
-	# rho = calculate_scaler_ranges(R, rhohat, c1c3_arr)
-	# _r2 = calculate_position_vector(rho, rhohat, R)
-	# d1d3 = calculate_d1d3(fg_arr)
-	# r1r3 = calculate_r1r3(fg_arr, r2, r2_dot)
-	# _r2_dot = calculate_velocity_vector(d1d3, r1r3)
+def correct_light_travel(rho_arr, t_arr):
+	return t_arr - (np.array(rho_arr)/od.cAU)
 
 
-def GaussMethod(R, rhohat_arr, r2, r2_dot, tau_arr, tol=1e-12):
-	dif = float(inf)
+def GaussMethod(R_arr, rhohat_arr, r2, tau_arr, t_arr, text, D0, D, tol=1e-14):
+	dif, iterations, r2_dot, _r2_dot, _rho_arr, _r2, rho_arr = float(inf), 0, None, None, None, None, None
 	while dif > tol:
-		fg_arr = np.array([calculate_fg(tau_arr[0], r2, r2_dot), calculate_fg(tau_arr[2], r2, r2_dot)])
-		c1c3_arr = calculate_c1c3(fg_arr)
-		rho_arr = calculate_scaler_ranges(R, rhohat_arr, c1c3_arr)
-		_r2 = calculate_position_vector(rho_arr, rhohat_arr, R)
-		d1d3 = calculate_d1d3(fg_arr)
-		r1r3 = calculate_r1r3(fg_arr, r2, r2_dot)
-		_r2_dot = calculate_velocity_vector(d1d3, r1r3)
+		fg_arr = np.array([calculate_fg(tau_arr[0], r2, r2_dot, False), calculate_fg(tau_arr[1], r2, r2_dot, False)])
+		rho_arr = calculate_scaler_ranges(calculate_c1c3(fg_arr), D0, D)
+		r, d1d3 = calculate_position_vector(rho_arr, rhohat_arr, R_arr), calculate_d1d3(fg_arr)
+		_r2_dot = calculate_velocity_vector(d1d3, r)
+		r2, r2_dot, _t_arr = r[1], _r2_dot, correct_light_travel(rho_arr, t_arr)
+		tau_arr = np.array([od.convert_day_to_gaussian(_t_arr[0] - _t_arr[1]), od.convert_day_to_gaussian(_t_arr[2] - _t_arr[1]), od.convert_day_to_gaussian(_t_arr[2] - _t_arr[0])])
 
-	return
+		if iterations is not 0:
+			dif = abs(np.linalg.norm(rho_arr[1]) - np.linalg.norm(_rho_arr[1]))
+			t = "\t\tIteration: " + str(iterations).rjust(2, "0") + "\n\t\t\tΔρ2 = {} AU\n\t\t\tlight-travel time = {} sec".format(dif, 2*12*3600*rho_arr[1]/od.cAU)
+			text.append(t)
+		_rho_arr, _r2 = rho_arr, r2
+		iterations+=1
+		if iterations > 999999: break
 
-
-if __name__ == '__main__':
-	test()
+	return r2, r2_dot, rho_arr[1]

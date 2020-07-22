@@ -1,17 +1,18 @@
 from odlib import Ephemeris, OrbitalElements
-from odlib.Conversion import convert_day_to_gaussian, calculate_julian_date
-import datetime
+from odlib.Conversion import calculate_julian_date
+import numpy as np
+from math import degrees, radians, pi
 
 
 class Asteroid:
     def __init__(self, position, velocity, date):
         self.position = position
-        self.velocity = convert_day_to_gaussian(velocity)
+        self.velocity = velocity
+
         self.earth_sun, self.rho, self.rhohat = {}, {}, {}
         self.name = None
         self.RA, self.dec = {}, {}
-        if type(date) == str: self.julian_date, self.date = calculate_julian_date(*list(map(int, date.split("/")))), None
-        elif type(date) == datetime.datetime:  self.julian_date, self.date = calculate_julian_date(datetime=date), date
+        self.date = date
 
         # Orbital elements
         self.angular_momentum = OrbitalElements.calculate_angular_momentum(self.position, self.velocity)
@@ -21,11 +22,12 @@ class Asteroid:
         self.ascending_node = OrbitalElements.calculate_longitude_of_ascending_node(self.angular_momentum, self.inclination)
         self.argument_perihelion = OrbitalElements.calculate_perihelion(self.position, self.inclination, self.semimajor_axis, self.eccentricity, self.velocity, self.angular_momentum,self.ascending_node)
         self.eccentric_anomaly = OrbitalElements.calculate_eccentric_anomaly(self.eccentricity, self.position, self.semimajor_axis)
-        #
         self.mean_anomaly = {self.date: OrbitalElements.calculate_mean_anomaly(self.eccentricity, self.eccentric_anomaly)}
+        self.E = Ephemeris.calculate_E(self.mean_anomaly[self.date], self.eccentricity)
+        self.n = np.linalg.norm(OrbitalElements.calculate_n(h=self.angular_momentum, e=self.eccentricity, a=self.semimajor_axis))
 
-        self.perihelion_passage = OrbitalElements.calculate_last_perihelion_passage(self.mean_anomaly[self.date], self.semimajor_axis, self.julian_date)
-        self.perihelion_passage = 2458158.720894547645
+        self.perihelion_passage = OrbitalElements.calculate_last_perihelion_passage(self.mean_anomaly[self.date], self.semimajor_axis, self.date)
+        self.P = 2*pi/self.n/365.25385
 
     def get_orbital_elements(self):
         return [self.semimajor_axis, self.eccentricity, self.inclination, self.ascending_node, self.argument_perihelion, self.mean_anomaly]
@@ -54,7 +56,10 @@ class Asteroid:
             "earth_sun": self.earth_sun,
             "earth_asteroid": self.rho,
             "earth_asteroid_unit": self.rhohat,
-            "calculated_date": self.julian_date
+            "calculated_date": self.date,
+            "n": radians(self.n),
+            "E": degrees(self.E),
+            "P": degrees(self.P)
         }
         choice = switch.get(element, lambda: "Invalid element")
         return choice
@@ -71,7 +76,7 @@ class Asteroid:
     def set_mean_anomaly(self,datetime, M=None):
         if M is None:
             date = calculate_julian_date(datetime=datetime)
-            self.mean_anomaly[datetime] = Ephemeris.calculate_M(self.semimajor_axis, self.mean_anomaly, date, self.julian_date)
+            self.mean_anomaly[datetime] = Ephemeris.calculate_M(self.semimajor_axis, self.mean_anomaly, date, self.date)
         else:
             self.mean_anomaly[datetime] = M
 
@@ -84,7 +89,7 @@ class Asteroid:
     def calculate_RA_dec(self, datetime):
         if datetime not in self.RA:
             date = calculate_julian_date(datetime=datetime)
-            self.mean_anomaly[datetime] = Ephemeris.calculate_M(self.semimajor_axis, self.mean_anomaly[self.date], date, self.julian_date)
+            self.mean_anomaly[datetime] = Ephemeris.calculate_M(self.semimajor_axis, self.mean_anomaly[self.date], date, self.date)
             rho, rhohat = Ephemeris.calculate_rho(Ephemeris.convert_ecliptic_cartesian(Ephemeris.convert_cartesian_ecliptic(Ephemeris.calculate_cartesian_coordinates(self.semimajor_axis, Ephemeris.calculate_E(self.mean_anomaly[datetime], self.eccentricity), self.eccentricity), self.ascending_node, self.inclination, self.argument_perihelion)), self.earth_sun[datetime])
             self.rho[datetime], self.rhohat[datetime] = rho, rhohat
             ra, dec = Ephemeris.calculate_RA_dec(rhohat)

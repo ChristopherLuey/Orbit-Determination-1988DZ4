@@ -2,7 +2,7 @@ from math import sin, cos, inf
 import numpy as np
 import odlib as od
 
-def test():
+def _test():
 	M, e, tol, dif = 0.42, 0.8, 1e-10, float(inf)
 	E, iterations = M, 1
 	while dif > tol:
@@ -38,7 +38,7 @@ def _newton_raphson_delta_eccentric_anomaly(E, r2, r2_dot, a, n, tau_i, a1):
 	return E - (f/_f)
 
 
-def newton_raphson_delta_eccentric_anomaly(tau_i, r2, r2_dot, tol=1e-10):
+def newton_raphson_delta_eccentric_anomaly(tau_i, r2, r2_dot, tol=1e-14):
 	dif = float(inf)
 	a, n = od.OrbitalElements.calculate_semimajor_axis(r2, r2_dot), od.OrbitalElements.calculate_n(r=r2, r_dot=r2_dot)
 	e = od.OrbitalElements.calculate_eccentricity(od.OrbitalElements.calculate_angular_momentum(r2, r2_dot), a)
@@ -54,4 +54,4 @@ def newton_raphson_delta_eccentric_anomaly(tau_i, r2, r2_dot, tol=1e-10):
 
 
 if __name__ == '__main__':
-	test()
+	_test()
