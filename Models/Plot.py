@@ -3,7 +3,7 @@ import numpy as np
 
 
 def histogram_plot():
-        elements = np.loadtxt("io/MonteCarlo/monte.txt")
+        elements = np.loadtxt("io/MonteCarlo/MonteSimulation.txt")
         elements = np.reshape(elements, (-1, 10))
 
         fig, ax = plt.subplots(3, 2, figsize = (15,15))
@@ -47,7 +47,7 @@ def histogram_plot():
 
 
 def standard_deviation():
-        elements = np.loadtxt("io/MonteCarlo/monte.txt")
+        elements = np.loadtxt("io/MonteCarlo/MonteSimulation.txt")
         elements = np.reshape(elements, (-1, 10))
         average = np.average(elements, axis=0)
         print(np.average(np.subtract(elements[:, 0], average[0]) ** 2) ** (1 / 2))

@@ -47,7 +47,7 @@ def run(thread):
         if elements.size == 0: elements = li
         else: elements = np.vstack((elements,li))
         if iteration % 1000 == 0: print(thread, iteration)
-    with open('io/MonteCarlo/monte.txt', 'ab') as f: np.savetxt(f, elements, fmt='%.8f')
+    with open('io/MonteCarlo/MonteSimulation.txt', 'ab') as f: np.savetxt(f, elements, fmt='%.8f')
 
     # Uncertainty
     # 2.166E-4, 1.3964E-4, 8.8231E-6
@@ -55,7 +55,7 @@ def run(thread):
 
 
 def thread():
-    f = open("io/MonteCarlo/monte.txt", 'w')
+    f = open("io/MonteCarlo/MonteSimulation.txt", 'w')
     f.close()
     print("Running 1,000,000 simulations")
     p, p2, p3, p4 = Process(target=run, args=("CPU Core 1: ", )), Process(target=run, args=("CPU Core 2: ", )), Process(target=run, args=("CPU Core 3: ", )), Process(target=run, args=("CPU Core 4: ", ))
@@ -67,7 +67,7 @@ def thread():
     p2.join()
     p3.join()
     p4.join()
-    elements = np.loadtxt("io/MonteCarlo/monte.txt")
+    elements = np.loadtxt("io/MonteCarlo/MonteSimulation.txt")
     elements = np.reshape(elements, (-1, 10))
     print(np.average(elements, axis=0))
     return elements
