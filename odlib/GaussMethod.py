@@ -73,7 +73,7 @@ def correct_light_travel(rho_arr, t_arr):
 	return t_arr - (np.array(rho_arr)/od.cAU)
 
 
-def GaussMethod(R_arr, rhohat_arr, r2, tau_arr, t_arr, text, D0, D, tol=1e-14):
+def GaussMethod(R_arr, rhohat_arr, r2, tau_arr, t_arr, text, D0, D, tol=1e-10):
 	dif, iterations, r2_dot, _r2_dot, _rho_arr, _r2, rho_arr = float(inf), 0, None, None, None, None, None
 	while dif > tol:
 		fg_arr = np.array([calculate_fg(tau_arr[0], r2, r2_dot, False), calculate_fg(tau_arr[1], r2, r2_dot, False)])
@@ -85,10 +85,14 @@ def GaussMethod(R_arr, rhohat_arr, r2, tau_arr, t_arr, text, D0, D, tol=1e-14):
 
 		if iterations is not 0:
 			dif = abs(np.linalg.norm(rho_arr[1]) - np.linalg.norm(_rho_arr[1]))
-			t = "\t\tIteration: " + str(iterations).rjust(2, "0") + "\n\t\t\tΔρ2 = {} AU\n\t\t\tlight-travel time = {} sec".format(dif, 2*12*3600*rho_arr[1]/od.cAU)
-			text.append(t)
+			if text is not None:
+				t = "\t\tIteration: " + str(iterations).rjust(2, "0") + "\n\t\t\tΔρ2 = {} AU\n\t\t\tlight-travel time = {} sec".format(dif, 2*12*3600*rho_arr[1]/od.cAU)
+				text.append(t)
 		_rho_arr, _r2 = rho_arr, r2
 		iterations+=1
-		if iterations > 999999: break
+		if iterations > 1000:
+			if text is not None:
+				text = text[:len(text) - 100]
+			return None, None, None, text
 
-	return r2, r2_dot, rho_arr[1]
+	return r2, r2_dot, rho_arr[1], text

@@ -1,5 +1,5 @@
 import numpy as np
-from math import degrees, radians, acos, cos, sin, sqrt
+from math import degrees, acos, cos, sin, sqrt
 from odlib.Constants import *
 from odlib.Conversion import atan2
 

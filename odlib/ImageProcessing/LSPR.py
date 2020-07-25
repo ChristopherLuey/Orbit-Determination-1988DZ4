@@ -1,6 +1,7 @@
 import numpy as np
 from odlib.__init__ import convert_DMS_degrees, convert_degrees_DMS, convert_HMS_degrees, convert_degrees_HMS
 
+
 def LSPR(f):
     # Parse file
     file = open(f, 'r')
@@ -73,3 +74,6 @@ def test(f, x_obj, y_obj, uncert_a, uncert_d, a_obj, d_obj, plate_a, plate_d):
 
 if __name__ == '__main__':
     test()
+
+
+
